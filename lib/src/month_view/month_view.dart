@@ -60,6 +60,11 @@ class MonthView<T extends Object?> extends StatefulWidget {
   /// This method will be called when user double taps on event tile.
   final TileTapCallback<T>? onEventDoubleTap;
 
+  /// Show weekends or not
+  ///
+  /// Default value is true.
+  final bool showWeekends;
+
   /// Builds the name of the weeks.
   ///
   /// Used default week builder if null.
@@ -180,6 +185,7 @@ class MonthView<T extends Object?> extends StatefulWidget {
     this.maxMonth,
     this.controller,
     this.initialMonth,
+    this.showWeekends = true,
     this.borderSize = 1,
     this.useAvailableVerticalSpace = false,
     this.cellAspectRatio = 0.55,
@@ -348,7 +354,7 @@ class MonthViewState<T extends Object?> extends State<MonthView<T>> {
                         width: _width,
                         child: Row(
                           children: List.generate(
-                            7,
+                            widget.showWeekends ? 7 : 5,
                             (index) => Expanded(
                               child: SizedBox(
                                 width: _cellWidth,
