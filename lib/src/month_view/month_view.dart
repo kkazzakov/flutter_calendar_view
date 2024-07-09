@@ -679,26 +679,20 @@ class _MonthPageBuilder<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cellsNumber = dayCount == 5 ? 30 : 42;
     final monthDays = date.datesOfMonths(startDay: startDay);
-    return Container(
-      width: width,
-      height: height,
-      child: GridView.builder(
-        padding: EdgeInsets.zero,
-        physics: physics,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: dayCount,
-          childAspectRatio: cellRatio,
-        ),
-        itemCount: 42,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final events = controller.getEventsOnDay(monthDays[index]);
-          return GestureDetector(
+    final gridViewItems = <Widget>[];
+    for (var index = 0; index < cellsNumber; index++) {
+      final events = controller.getEventsOnDay(monthDays[index]);
+      bool isWeekend = monthDays[index].weekday == 6 || monthDays[index].weekday == 7;
+      if (!isWeekend || isWeekend && dayCount == 7) {
+        gridViewItems.add(
+          GestureDetector(
             onTap: () => onCellTap?.call(events, monthDays[index]),
             onLongPress: () => onDateLongPress?.call(monthDays[index]),
             child: Container(
               decoration: BoxDecoration(
+                color: Colors.transparent,
                 border: showBorder
                     ? Border.all(
                         color: borderColor,
@@ -714,7 +708,36 @@ class _MonthPageBuilder<T> extends StatelessWidget {
                 hideDaysNotInMonth,
               ),
             ),
-          );
+          ),
+        );
+      }
+    }
+    return Container(
+      width: width,
+      height: height,
+      child: GridView.builder(
+        padding: EdgeInsets.zero,
+        physics: physics,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: dayCount,
+          childAspectRatio: cellRatio,
+        ),
+        itemCount: cellsNumber,
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          if (index > gridViewItems.length - 1) {
+            return Container(
+                decoration: BoxDecoration(
+              color: Colors.grey[200],
+              border: showBorder
+                  ? Border.all(
+                      color: borderColor,
+                      width: borderSize,
+                    )
+                  : null,
+            ));
+          }
+          return gridViewItems[index];
         },
       ),
     );
